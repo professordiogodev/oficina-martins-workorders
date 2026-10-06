@@ -1,0 +1,60 @@
+==============================================================
+ OFICINA MARTINS & FILHOS - server notes
+ Written by R. Tavares, 14 June 2003
+ Keep this file! If the PC dies, this is how to rebuild it.
+==============================================================
+
+MACHINE
+-------
+  Compaq Deskpro, Pentium III 733MHz, 128MB RAM, 10GB disk
+  (beige box under the counter in the back office)
+  OS: Debian GNU/Linux 3.0 "woody"
+  IP: 192.168.0.10 - the counter PC opens http://192.168.0.10/workorders/
+
+SOFTWARE
+--------
+  apt-get update
+  apt-get install apache php3
+
+  -> Apache 1.3.26 + PHP 3.0.18 (as an Apache module)
+  -> php3 install asks if it should run "apacheconfig". Say N.
+     I prefer to edit the config by hand (see below).
+  -> If any other question appears, just press ENTER.
+
+APACHE CONFIG  (/etc/apache/httpd.conf)
+---------------------------------------
+  There is no fancy editor on this box, use "nano" or "vi".
+  (nano: Ctrl+W to search, Ctrl+O to save, Ctrl+X to exit)
+
+  1) Enable the PHP module. Find this line and remove the "# ":
+        # LoadModule php3_module /usr/lib/apache/1.3/libphp3.so
+
+  2) Tell Apache that .php3 files are PHP. Find and remove the "#":
+        #AddType application/x-httpd-php3 .php3
+
+  3) So that /workorders/ opens the app, add index.php3 to the
+     DirectoryIndex line, like this:
+        DirectoryIndex index.php3 index.html index.htm index.shtml index.cgi
+
+  Then:  apachectl configtest    (must say "Syntax OK")
+         apachectl restart
+
+THE APP
+-------
+  Files go in:   /var/www/workorders/
+  (I copied them with a floppy disk, workorders.tgz)
+
+  The web server runs as user www-data and MUST be able to write
+  the data file, otherwise new orders are not saved:
+        chown -R www-data /var/www/workorders/data
+
+  ALL THE DATA IS IN ONE FILE:  /var/www/workorders/data/orders.dat
+  Copy it to a floppy every Friday!!!
+
+CHECK IT WORKS
+--------------
+  Open http://192.168.0.10/workorders/
+  The footer must say "PHP 3.0.18".
+
+  Do NOT upgrade PHP to version 4, the app was written for PHP 3
+  and I have not tested it on 4. - RT
